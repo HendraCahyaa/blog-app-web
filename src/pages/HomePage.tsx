@@ -1,29 +1,34 @@
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { axiosInstance } from "@/lib/axios";
 import { useLoginStore } from "@/stores/useLogin";
 import type { Blog } from "@/types/blogs";
+import type { PaginationResponse } from "@/types/pagination";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 function HomePage() {
-  const [Blogs, setBlogs] = useState<Blog[]>([]);
+  const [blogs, setBlogs] = useState<PaginationResponse<Blog> | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [page, setPage] = useState<Number>(1);
 
   const { user, logout } = useLoginStore();
 
   const getBlogs = async () => {
     try {
-      const { data } = await axiosInstance.get<any>("/data/Blogs");
-      if (Array.isArray(data)) {
-        setBlogs(data);
-      } else if (data && Array.isArray(data.results)) {
-        // Antisipasi jika SDK/API REST membungkusnya di dalam properti .results
-        setBlogs(data.results);
-      } else {
-        // Jika data bukan array (misal object eror dari server), amankan dengan array kosong
-        setBlogs([]);
-      }
+      const { data } = await axiosInstance.get<PaginationResponse<Blog>>(
+        "/posts",
+        { params: { page: page } },
+      );
+      setBlogs(data);
     } catch (error) {
       console.log("error");
     } finally {
@@ -31,9 +36,25 @@ function HomePage() {
     }
   };
 
+  const handlePrev = () => {
+    const currentPage = blogs?.meta.page || 1;
+    if (currentPage > 1) {
+      setPage(currentPage - 1);
+    }
+  };
+  const handleNext = () => {
+    const currentPage = blogs?.meta.page || 1;
+    const total = blogs?.meta.total || 0;
+    const take = blogs?.meta.take || 0;
+    const totalPage = Math.ceil(total / take);
+
+    if (currentPage < totalPage) {
+      setPage(currentPage + 1);
+    }
+  };
   useEffect(() => {
     getBlogs();
-  }, []);
+  }, [page]);
   return (
     <div>
       <div className="flex justify-center items-center h-24">
@@ -58,9 +79,9 @@ function HomePage() {
         </div>
       ) : (
         <div className="flex flex-row gap-16 justify-center items-center">
-          {Blogs.map((blog) => {
+          {blogs?.data.map((blog, i) => {
             return (
-              <Link key={blog.objectId} to={`/blogs/${blog.objectId}`}>
+              <Link key={i} to={`/blogs/${blog.objectId}`}>
                 <div className="border-2 border-black p-8 ">
                   <p className="text-lg font-bold">{blog.title}</p>
                   <p>{blog.description}</p>
@@ -71,6 +92,19 @@ function HomePage() {
           })}
         </div>
       )}
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem onClick={handlePrev}>
+            <PaginationPrevious />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink>{blogs?.meta.page || 1}</PaginationLink>
+          </PaginationItem>
+          <PaginationItem onClick={handleNext}>
+            <PaginationNext />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }
