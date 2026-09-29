@@ -1,5 +1,6 @@
 import { z } from "zod";
-export const loginSchema = z.object({
+export const registerSchema = z.object({
+  name: z.string().min(3),
   email: z.email(),
   password: z
     .string()
@@ -11,4 +12,4 @@ export const loginSchema = z.object({
       message: "Must containt at least code one special character",
     }),
 });
-export type LoginSchema = z.infer<typeof loginSchema>;
+export type RegisterSchema = z.infer<typeof registerSchema>;
