@@ -10,13 +10,13 @@ import {
 } from "@/components/ui/pagination";
 import { axiosInstance } from "@/lib/axios";
 import { useLoginStore } from "@/stores/useLogin";
-import type { Blog } from "@/types/blogs";
 import type { PaginationResponse } from "@/types/pagination";
+import type { Post } from "@/types/post";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 function HomePage() {
-  const [blogs, setBlogs] = useState<PaginationResponse<Blog> | null>(null);
+  const [blogs, setBlogs] = useState<PaginationResponse<Post> | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [page, setPage] = useState<Number>(1);
 
@@ -24,7 +24,7 @@ function HomePage() {
 
   const getBlogs = async () => {
     try {
-      const { data } = await axiosInstance.get<PaginationResponse<Blog>>(
+      const { data } = await axiosInstance.get<PaginationResponse<Post>>(
         "/posts",
         { params: { page: page } },
       );
@@ -79,13 +79,13 @@ function HomePage() {
         </div>
       ) : (
         <div className="flex flex-row gap-16 justify-center items-center">
-          {blogs?.data.map((blog, i) => {
+          {blogs?.data.map((blog) => {
             return (
-              <Link key={i} to={`/blogs/${blog.objectId}`}>
+              <Link key={blog.slug} to={`/blogs/${blog.slug}`}>
                 <div className="border-2 border-black p-8 ">
                   <p className="text-lg font-bold">{blog.title}</p>
                   <p>{blog.description}</p>
-                  <p>{blog.author}</p>
+                  <p>{blog.user.name}</p>
                 </div>
               </Link>
             );
