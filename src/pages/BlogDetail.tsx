@@ -1,19 +1,17 @@
 import { axiosInstance } from "@/lib/axios";
-import { type Blog } from "@/types/blogs";
+import type { Post } from "@/types/post";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 
 function BlogDetail() {
   const params = useParams();
 
-  const [blog, setBlog] = useState<Blog | null>(null);
+  const [blog, setBlog] = useState<Post | null>(null);
   const [isloading, setLoading] = useState<boolean>(false);
 
   const getBlog = async () => {
     try {
-      const { data } = await axiosInstance.get<Blog>(
-        `data/blogs/${params.objectId}`,
-      );
+      const { data } = await axiosInstance.get<Post>(`/posts/${params.slug}`);
       setBlog(data);
     } catch (error) {
       console.log("error");
@@ -54,7 +52,7 @@ function BlogDetail() {
       />
       <h1 className="text-3xl font-bold">Blog detail - {blog.title}</h1>
       <p>
-        {blog.category} - {blog.author}
+        {blog.category} - {blog.user.name}
       </p>
 
       <p>{blog.content}</p>
