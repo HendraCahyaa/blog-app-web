@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { axiosInstance } from "@/lib/axios";
 import { createBlogSchema, type CreateBlogSchema } from "@/schemas/createBlog";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
@@ -38,7 +39,6 @@ function CreateBlog() {
       title: "",
       description: "",
       category: "",
-      author: "",
       content: "",
       thumbnail: undefined,
     },
@@ -53,17 +53,17 @@ function CreateBlog() {
       const fileName = Date.now() + Math.floor(Math.random() * 1000);
       const folderName = "images";
 
-      const response = await axiosInstance.post<ResponseFileService>(
-        `/files/${folderName}/${fileName}`,
+      const response = await axios.post<ResponseFileService>(
+        `https://finestpunishment-us.backendless.app/api/files/${folderName}/${fileName}`,
         formData,
       );
 
       // step 2 : submit data (yang berupa tulisan) ke backendless
-      await axiosInstance.post("/data/Blogs", {
+      await axiosInstance.post("/posts/", {
         title: data.title,
         description: data.description,
         category: data.category,
-        author: data.author,
+        userId: 1,
         content: data.content,
         thumbnail: response.data.fileURL,
       });
@@ -145,26 +145,6 @@ function CreateBlog() {
                       id="form-category"
                       aria-invalid={fieldState.invalid}
                       placeholder="Your category"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="author"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="form-author">Author</FieldLabel>
-                    <Input
-                      {...field}
-                      id="form-author"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Your author"
                       autoComplete="off"
                     />
                     {fieldState.invalid && (
