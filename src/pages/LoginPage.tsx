@@ -23,17 +23,18 @@ function LoginPage() {
   const handleLogin = async (values: LoginSchema) => {
     setLoading(true);
     try {
-      const url = "/users/login";
-      const { data } = await axiosInstance.post(url, {
-        login: values.email,
+      const { data } = await axiosInstance.post("/auth/login", {
+        email: values.email,
         password: values.password,
       });
       alert("Login Succes!");
       login({
-        name: data.name,
-        email: data.email,
-        objectId: data.objectId,
-        token: data["user-token"],
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        role: data.user.role,
+        profilePic: data.user.profilePic,
+        accessToken: data.accessToken,
       });
       navigate("/home");
     } catch (error) {
