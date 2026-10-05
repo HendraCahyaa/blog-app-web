@@ -15,23 +15,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { axiosInstance } from "@/lib/axios";
+import { useCreateBlog } from "@/hooks/api/post/useCreateBlog";
 import { createBlogSchema, type CreateBlogSchema } from "@/schemas/createBlog";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
-
-interface ResponseFileService {
-  fileURL: string;
-  filePath: string;
-}
 
 function CreateBlog() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const navigate = useNavigate();
+  const { mutate, isPending } = useCreateBlog();
 
   const form = useForm<CreateBlogSchema>({
     resolver: zodResolver(createBlogSchema),
@@ -44,38 +34,8 @@ function CreateBlog() {
     },
   });
 
-  async function onSubmit(data: CreateBlogSchema) {
-    try {
-      setIsLoading(true);
-      // step 1 : upload thumbnail ke file service
-      const formData = new FormData();
-      formData.append("file", data.thumbnail);
-      const fileName = Date.now() + Math.floor(Math.random() * 1000);
-      const folderName = "images";
-
-      const response = await axios.post<ResponseFileService>(
-        `https://finestpunishment-us.backendless.app/api/files/${folderName}/${fileName}`,
-        formData,
-      );
-
-      // step 2 : submit data (yang berupa tulisan) ke backendless
-      await axiosInstance.post("/posts/", {
-        title: data.title,
-        description: data.description,
-        category: data.category,
-        userId: 1,
-        content: data.content,
-        thumbnail: response.data.fileURL,
-      });
-
-      alert("Create blog success");
-
-      navigate("/");
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
+  function onSubmit(data: CreateBlogSchema) {
+    mutate(data);
   }
 
   return (
@@ -205,11 +165,12 @@ function CreateBlog() {
               type="button"
               variant="outline"
               onClick={() => form.reset()}
+              disabled={isPending}
             >
               Reset
             </Button>
-            <Button type="submit" form="form-create-blog" disabled={isLoading}>
-              {isLoading ? "Loading" : "Submit"}
+            <Button type="submit" form="form-create-blog" disabled={isPending}>
+              {isPending ? "Loading..." : "Submit"}
             </Button>
           </Field>
         </CardFooter>
