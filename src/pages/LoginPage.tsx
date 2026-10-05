@@ -1,48 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { axiosInstance } from "@/lib/axios";
+import useLogin from "@/hooks/api/post/auth/useLogin";
 import { loginSchema, type LoginSchema } from "@/schemas/login";
-import { useLoginStore } from "@/stores/useLogin";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
 
 function LoginPage() {
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const { login } = useLoginStore();
-  const navigate = useNavigate();
-
   const { register, handleSubmit, formState } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
 
-  // const navigate = useNavigate();
+  const { mutate, isPending } = useLogin();
 
-  const handleLogin = async (values: LoginSchema) => {
-    setLoading(true);
-    try {
-      const { data } = await axiosInstance.post("/auth/login", {
-        email: values.email,
-        password: values.password,
-      });
-      alert("Login Succes!");
-      login({
-        id: data.user.id,
-        name: data.user.name,
-        email: data.user.email,
-        role: data.user.role,
-        profilePic: data.user.profilePic,
-        accessToken: data.accessToken,
-      });
-      navigate("/home");
-    } catch (error) {
-      console.log("error");
-      alert("Login Failed!");
-    } finally {
-      setLoading(false);
-    }
+  const handleLogin = (values: LoginSchema) => {
+    mutate(values);
   };
   return (
     <form onSubmit={handleSubmit(handleLogin)}>
@@ -63,8 +35,8 @@ function LoginPage() {
           </p>
         )}
         <br />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Loading" : "Submit"}
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Loading" : "Submit"}
         </Button>
       </div>
     </form>

@@ -1,60 +1,18 @@
+import GlobalPagination from "@/components/GlobalPagiantion";
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { axiosInstance } from "@/lib/axios";
+import useGetPost from "@/hooks/api/post/useGetPost";
 import { useLoginStore } from "@/stores/useLogin";
-import type { PaginationResponse } from "@/types/pagination";
-import type { Post } from "@/types/post";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 
 function HomePage() {
-  const [blogs, setBlogs] = useState<PaginationResponse<Post> | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<Number>(1);
+  const [page, setPage] = useState<number>(1);
 
   const { user, logout } = useLoginStore();
 
-  const getBlogs = async () => {
-    try {
-      const { data } = await axiosInstance.get<PaginationResponse<Post>>(
-        "/posts",
-        { params: { page: page } },
-      );
-      setBlogs(data);
-    } catch (error) {
-      console.log("error");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data: blogs, isPending } = useGetPost({ page });
 
-  const handlePrev = () => {
-    const currentPage = blogs?.meta.page || 1;
-    if (currentPage > 1) {
-      setPage(currentPage - 1);
-    }
-  };
-  const handleNext = () => {
-    const currentPage = blogs?.meta.page || 1;
-    const total = blogs?.meta.total || 0;
-    const take = blogs?.meta.take || 0;
-    const totalPage = Math.ceil(total / take);
-
-    if (currentPage < totalPage) {
-      setPage(currentPage + 1);
-    }
-  };
-  useEffect(() => {
-    getBlogs();
-  }, [page]);
   return (
     <div>
       <div className="flex justify-center items-center h-24">
@@ -67,13 +25,13 @@ function HomePage() {
             </Button>
           </div>
         ) : (
-          <Link to="/write">
+          <Link to="/login">
             <Button>Login</Button>
           </Link>
         )}
       </div>
 
-      {isLoading ? (
+      {isPending ? (
         <div className="flex justify-center items-center h-100">
           <Loading />
         </div>
@@ -92,19 +50,13 @@ function HomePage() {
           })}
         </div>
       )}
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem onClick={handlePrev}>
-            <PaginationPrevious />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink>{blogs?.meta.page || 1}</PaginationLink>
-          </PaginationItem>
-          <PaginationItem onClick={handleNext}>
-            <PaginationNext />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      {!!blogs?.meta && (
+        <GlobalPagination
+          currentPage={blogs.meta.page}
+          totalPage={Math.ceil(blogs?.meta.total / blogs?.meta.take)}
+          onChangePage={(p) => setPage(p)}
+        />
+      )}
     </div>
   );
 }
