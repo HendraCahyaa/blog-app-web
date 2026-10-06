@@ -10,7 +10,7 @@ function useCreateBlog() {
   return useMutation({
     mutationFn: async (data: CreateBlogSchema) => {
       const formData = new FormData();
-      formData.append("file", data.thumbnail);
+      // formData.append("file", data.thumbnail);
 
       formData.append("title", data.title);
       formData.append("description", data.description);
@@ -18,11 +18,15 @@ function useCreateBlog() {
       formData.append("content", data.content);
       formData.append("thumbnail", data.thumbnail);
 
-      await axiosInstance.post("/posts", formData);
+      await axiosInstance.post("/posts", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
     },
     onSuccess: () => {
       alert("Create blog success");
-      navigate("/");
+      navigate("/home");
     },
     onError: (error: AxiosError<{ message: string }>) => {
       console.error(error);
