@@ -29,6 +29,9 @@ function HomePage() {
             <Button>Login</Button>
           </Link>
         )}
+        <Link to="/write">
+          <button>Write</button>
+        </Link>
       </div>
 
       {isPending ? (
