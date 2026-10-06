@@ -3,8 +3,9 @@ import { type LoginSchema } from "@/schemas/login";
 import { useLoginStore } from "@/stores/useLogin";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
- function useLogin() {
+function useLogin() {
   const { login } = useLoginStore();
   const navigate = useNavigate();
 
@@ -17,7 +18,7 @@ import { useNavigate } from "react-router";
       return data;
     },
     onSuccess: (data) => {
-      alert("Login Success!");
+      toast.success("Login Success!");
       login({
         id: data.user.id,
         name: data.user.name,
@@ -30,8 +31,8 @@ import { useNavigate } from "react-router";
     },
     onError: (error) => {
       console.error(error);
-      alert("Login Failed!");
+      toast.error("Login Failed!");
     },
   });
 }
-export default useLogin
+export default useLogin;

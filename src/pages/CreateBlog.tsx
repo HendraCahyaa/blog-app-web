@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useCreateBlog } from "@/hooks/api/post/useCreateBlog";
+import useCreateBlog from "@/hooks/api/post/useCreateBlog";
+
 import { createBlogSchema, type CreateBlogSchema } from "@/schemas/createBlog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
