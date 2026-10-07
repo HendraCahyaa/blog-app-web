@@ -9,7 +9,7 @@ function useForgotPassword() {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: async (values: ForgotPasswordSchema) => {
-      await axiosInstance.post("/auth/register", {
+      await axiosInstance.post("/auth/forgot-password", {
         email: values.email,
       });
     },
