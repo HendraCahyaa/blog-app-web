@@ -7,9 +7,15 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    if (config.headers.Authorization) {
+      console.log(
+        "Menggunakan token manual dari komponen:",
+        config.headers.Authorization,
+      );
+      return config;
+    }
     const token = useLoginStore.getState().user?.accessToken;
-    console.log("Isi seluruh state auth saat ini:", token);
-    console.log("Token yang diambil interseptor:", token);
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {

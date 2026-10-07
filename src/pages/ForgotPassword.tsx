@@ -24,7 +24,7 @@ import { Controller, useForm } from "react-hook-form";
 function ForgotPassword() {
   const { mutate, isPending } = useForgotPassword();
 
-  const form = useForm<ForgotPasswordSchema>({
+  const { handleSubmit, control, reset } = useForm<ForgotPasswordSchema>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
@@ -46,15 +46,13 @@ function ForgotPassword() {
             Help us improve by reporting bugs you encounter.
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          <form
-            id="form-forgot-password"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
+          <form id="form-forgot-password" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="email"
-                control={form.control}
+                control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="form-title">Email</FieldLabel>
@@ -79,12 +77,16 @@ function ForgotPassword() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => form.reset()}
+              onClick={() => reset()}
               disabled={isPending}
             >
               Reset
             </Button>
-            <Button type="submit" form="form-create-blog" disabled={isPending}>
+            <Button
+              type="submit"
+              form="form-forgot-password"
+              disabled={isPending}
+            >
               {isPending ? "Loading..." : "Submit"}
             </Button>
           </Field>
