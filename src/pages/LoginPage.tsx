@@ -1,3 +1,4 @@
+import ButtonLoginGoogle from "@/components/ButtonLoginGoogle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ function LoginPage() {
   const handleLogin = (values: LoginSchema) => {
     mutate(values);
   };
+
   return (
     <form onSubmit={handleSubmit(handleLogin)}>
       <div className="w-100 mx-auto border-2 border-black mt-10 p-8 space-y-4">
@@ -38,6 +40,8 @@ function LoginPage() {
         <Button type="submit" disabled={isPending}>
           {isPending ? "Loading" : "Submit"}
         </Button>
+
+        <ButtonLoginGoogle />
       </div>
     </form>
   );
