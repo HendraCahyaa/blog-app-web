@@ -14,6 +14,7 @@ import { Toaster } from "./components/ui/sonner";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import NotFound from "./pages/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
     path: "/write",
     element: <CreateBlog />,
     loader: authLoader,
+  },
+  {
+    path: "/*",
+    element: <NotFound />,
   },
 ]);
 
