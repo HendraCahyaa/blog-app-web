@@ -15,6 +15,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import NotFound from "./pages/NotFound";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,11 @@ const router = createBrowserRouter([
   {
     path: "/write",
     element: <CreateBlog />,
+    loader: authLoader,
+  },
+  {
+    path: "/change-password",
+    element: <ChangePasswordPage />,
     loader: authLoader,
   },
   {
