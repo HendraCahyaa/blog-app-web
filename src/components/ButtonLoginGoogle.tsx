@@ -20,7 +20,6 @@ function ButtonLoginGoogle() {
           email: response.data.user.email,
           role: response.data.user.role,
           profilePic: response.data.user.profilePic,
-          accessToken: response.data.user.accessToken,
         });
         navigate("/home");
       } catch (error) {

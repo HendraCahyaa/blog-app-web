@@ -3,25 +3,31 @@ import axios from "axios";
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL_API,
+  withCredentials: true,
+});
+export const refreshInstance = axios.create({
+  baseURL: import.meta.env.VITE_BASE_URL_API,
+  withCredentials: true,
 });
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    if (config.headers.Authorization) {
-      console.log(
-        "Menggunakan token manual dari komponen:",
-        config.headers.Authorization,
-      );
-      return config;
-    }
-    const token = useLoginStore.getState().user?.accessToken;
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.log("Peringatan: Request dikirim TANPA token!");
+    if (
+      error.response.status === 401 &&
+      error.data.message === "Token expired" &&
+      !originalRequest.retry
+    ) {
+      try {
+        await refreshInstance.post("/auth/refresh");
+        return axiosInstance(originalRequest);
+      } catch (error) {
+        useLoginStore.getState().logout();
+        return Promise.reject(error);
+      }
     }
-    return config;
+    return Promise.reject(error);
   },
-  (error) => Promise.reject(error),
 );

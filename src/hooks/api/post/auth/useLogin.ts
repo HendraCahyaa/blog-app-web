@@ -11,6 +11,8 @@ function useLogin() {
 
   return useMutation({
     mutationFn: async (values: LoginSchema) => {
+      console.log("Base URL terbaca:", import.meta.env.VITE_BASE_URL_API);
+
       const { data } = await axiosInstance.post("/auth/login", {
         email: values.email,
         password: values.password,
@@ -25,12 +27,12 @@ function useLogin() {
         email: data.user.email,
         role: data.user.role,
         profilePic: data.user.profilePic,
-        accessToken: data.accessToken,
       });
       navigate("/home");
     },
     onError: (error) => {
       console.error(error);
+
       toast.error("Login Failed!");
     },
   });
