@@ -1,4 +1,12 @@
+// src/pages/BlogDetail.tsx
+
+import Markdown from "@/components/MarkDown";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import useGetPostBySlug from "@/hooks/api/post/useGetPostBySlug";
+import { formatDate } from "@/utils/FormatDate";
+
 import { Link, useParams } from "react-router";
 
 function BlogDetail() {
@@ -17,28 +25,38 @@ function BlogDetail() {
   if (!blog) {
     return (
       <div>
-        <p>Blog not found</p>
+        <p>Blog Not Found</p>
 
         <Link to="/">
-          <button>Back</button>
+          <Button>Go to Homepage</Button>
         </Link>
       </div>
     );
   }
+
   return (
-    <div>
-      <img
-        src={blog.thumbnail || ""}
-        alt=""
-        className="h-57.5 w-full object-cover"
-      />
-      <h1 className="text-3xl font-bold">Blog detail - {blog.title}</h1>
-      <p>
-        {blog.category} - {blog.user.name}
+    <div className="container mx-auto space-y-4 my-16 px-6">
+      <Badge className="text-sm">{blog.category}</Badge>
+
+      <h1 className="text-3xl md:text-4xl font-bold">{blog.title}</h1>
+
+      <p className="font-light">
+        {blog.user.name} - {formatDate(blog.createAt)}
       </p>
 
-      <p>{blog.content}</p>
+      <img
+        src={blog.thumbnail || ""}
+        alt="thumbnail blog"
+        className="h-48 md:h-100 w-full object-cover rounded-sm"
+      />
+
+      <p className="text-lg md:text-xl">{blog.description}</p>
+
+      <Separator />
+
+      <Markdown content={blog.content} />
     </div>
   );
 }
+
 export default BlogDetail;

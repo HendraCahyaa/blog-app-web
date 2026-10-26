@@ -1,3 +1,4 @@
+import RichTextEditor from "@/components/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -121,12 +122,16 @@ function CreateBlog() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="form-content">Content</FieldLabel>
-                    <Textarea
+                    {/* <Textarea
                       {...field}
                       id="form-content"
                       aria-invalid={fieldState.invalid}
                       placeholder="Your content"
                       autoComplete="off"
+                    /> */}
+                    <RichTextEditor
+                      onChange={(content) => field.onChange(content)}
+                      value={field.value}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
